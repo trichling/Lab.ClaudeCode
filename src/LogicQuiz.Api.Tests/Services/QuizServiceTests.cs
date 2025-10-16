@@ -121,9 +121,9 @@ public class QuizServiceTests
         // Assert
         Assert.NotNull(result);
         Assert.Equal(10, result.Questions.Count); // Hard = 10 questions
-        
+
         // Hard mode should have at least 8 options, but may have more if all correct answers need to be included
-        Assert.True(result.AvailableFallacies.Count >= 8, 
+        Assert.True(result.AvailableFallacies.Count >= 8,
             $"Expected at least 8 fallacies, but got {result.AvailableFallacies.Count}");
 
         // Verify all correct answers are in the fallacy types
@@ -162,7 +162,7 @@ public class QuizServiceTests
     {
         // Arrange
         var context = await SeedTestData(Guid.NewGuid().ToString());
-        
+
         // Add more questions with duplicate correct answers
         var additionalQuestions = new List<Question>
         {
@@ -210,7 +210,7 @@ public class QuizServiceTests
         // Compare first order with others
         var firstOrder = orders[0];
         var allSame = orders.All(order => order.SequenceEqual(firstOrder));
-        
+
         Assert.False(allSame, "Fallacy types should be shuffled, but they appear in the same order every time");
     }
 
@@ -249,7 +249,7 @@ public class QuizServiceTests
         // Assert
         Assert.NotNull(result);
         Assert.Equal(3, result.Questions.Count);
-        
+
         // All correct answers must be included
         foreach (var question in result.Questions)
         {
@@ -294,13 +294,13 @@ public class QuizServiceTests
         // Assert
         Assert.NotNull(result);
         Assert.Equal(3, result.Questions.Count);
-        
+
         // All correct answers must be included
         foreach (var question in result.Questions)
         {
             Assert.Contains(result.AvailableFallacies, ft => ft.Id == question.CorrectFallacyTypeId);
         }
-        
+
         // Should have exactly 3 fallacy types (the 3 required ones)
         Assert.Equal(3, result.AvailableFallacies.Count);
     }
@@ -345,13 +345,13 @@ public class QuizServiceTests
         Assert.NotNull(result);
         Assert.Equal(3, result.Questions.Count);
         Assert.Equal(3, result.AvailableFallacies.Count); // Should be filled to 3
-        
+
         // All correct answers must be included
         foreach (var question in result.Questions)
         {
             Assert.Contains(result.AvailableFallacies, ft => ft.Id == question.CorrectFallacyTypeId);
         }
-        
+
         // Should contain IDs 1 and 2 (required) plus 1 additional distractor
         Assert.Contains(result.AvailableFallacies, ft => ft.Id == 1);
         Assert.Contains(result.AvailableFallacies, ft => ft.Id == 2);
@@ -391,10 +391,10 @@ public class QuizServiceTests
         // Assert
         Assert.NotNull(result);
         Assert.Equal(3, result.Questions.Count);
-        
+
         // Should only have 2 fallacy types (no additional distractors available)
         Assert.Equal(2, result.AvailableFallacies.Count);
-        
+
         // All correct answers must be included
         foreach (var question in result.Questions)
         {
@@ -410,10 +410,10 @@ public class QuizServiceTests
         var service = new QuizService(context);
 
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentException>(() => 
+        await Assert.ThrowsAsync<ArgumentException>(() =>
             service.StartGameAsync("TestPlayer", 0));
-        
-        await Assert.ThrowsAsync<ArgumentException>(() => 
+
+        await Assert.ThrowsAsync<ArgumentException>(() =>
             service.StartGameAsync("TestPlayer", 4));
     }
 
@@ -426,20 +426,20 @@ public class QuizServiceTests
         context.Database.EnsureCreated();
 
         // Add only 1 question but Easy mode needs 3
-        var fallacyType = new FallacyType 
-        { 
-            Id = 1, 
-            Name = "Fallacy 1", 
-            Description = "Desc 1", 
-            Difficulty = 1 
+        var fallacyType = new FallacyType
+        {
+            Id = 1,
+            Name = "Fallacy 1",
+            Description = "Desc 1",
+            Difficulty = 1
         };
         context.FallacyTypes.Add(fallacyType);
 
-        var question = new Question 
-        { 
-            Id = 1, 
-            Statement = "Question 1", 
-            CorrectFallacyTypeId = 1 
+        var question = new Question
+        {
+            Id = 1,
+            Statement = "Question 1",
+            CorrectFallacyTypeId = 1
         };
         context.Questions.Add(question);
         await context.SaveChangesAsync();
@@ -447,7 +447,7 @@ public class QuizServiceTests
         var service = new QuizService(context);
 
         // Act & Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(() => 
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
             service.StartGameAsync("TestPlayer", 1));
     }
 
@@ -457,14 +457,14 @@ public class QuizServiceTests
         // Arrange
         var context = await SeedTestData(Guid.NewGuid().ToString());
         var service = new QuizService(context);
-        
+
         var gameState = await service.StartGameAsync("TestPlayer", 1);
         var firstQuestion = gameState.Questions.First();
 
         // Act
         var result = await service.SubmitAnswerAsync(
-            gameState.SessionId, 
-            firstQuestion.Id, 
+            gameState.SessionId,
+            firstQuestion.Id,
             firstQuestion.CorrectFallacyTypeId);
 
         // Assert
@@ -478,18 +478,18 @@ public class QuizServiceTests
         // Arrange
         var context = await SeedTestData(Guid.NewGuid().ToString());
         var service = new QuizService(context);
-        
+
         var gameState = await service.StartGameAsync("TestPlayer", 1);
         var firstQuestion = gameState.Questions.First();
-        
+
         // Get a wrong answer (any fallacy ID that's not the correct one)
         var wrongAnswerId = gameState.AvailableFallacies
             .First(ft => ft.Id != firstQuestion.CorrectFallacyTypeId).Id;
 
         // Act
         var result = await service.SubmitAnswerAsync(
-            gameState.SessionId, 
-            firstQuestion.Id, 
+            gameState.SessionId,
+            firstQuestion.Id,
             wrongAnswerId);
 
         // Assert
