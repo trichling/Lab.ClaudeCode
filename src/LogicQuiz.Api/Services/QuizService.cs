@@ -52,8 +52,14 @@ public class QuizService : IQuizService
             .Take(questionCount)
             .ToList();
 
-        // Get fallacy types based on difficulty
-        var fallacyTypes = await GetFallacyTypesByDifficultyAsync(difficulty);
+        // Extract the required fallacy IDs from the selected questions
+        var requiredFallacyIds = selectedQuestions
+            .Select(q => q.CorrectFallacyTypeId)
+            .Distinct()
+            .ToList();
+
+        // Get fallacy types based on difficulty, ensuring correct answers are included
+        var fallacyTypes = await GetFallacyTypesByDifficultyAsync(difficulty, requiredFallacyIds);
 
         // Create game session
         var session = new GameSession
@@ -185,7 +191,7 @@ public class QuizService : IQuizService
         );
     }
 
-    private async Task<List<FallacyType>> GetFallacyTypesByDifficultyAsync(int difficulty)
+    private async Task<List<FallacyType>> GetFallacyTypesByDifficultyAsync(int difficulty, List<int> requiredFallacyIds)
     {
         // Easy: 3 options (only difficulty 1)
         // Medium: 5 options (difficulty 1 and 2)
@@ -199,19 +205,33 @@ public class QuizService : IQuizService
             _ => 3
         };
 
-        var fallacyTypes = await _context.FallacyTypes
-            .Where(f => f.Difficulty <= maxDifficulty)
-            .OrderBy(f => f.Difficulty)
+        // 1. First, get all required fallacy types (the correct answers for the selected questions)
+        var requiredFallacies = await _context.FallacyTypes
+            .Where(f => requiredFallacyIds.Contains(f.Id))
             .ToListAsync();
 
-        // If we don't have enough fallacies at the requested difficulty level,
-        // take what we have
-        if (fallacyTypes.Count < count)
+        // 2. Get additional fallacy types as distractors
+        var additionalFallacies = await _context.FallacyTypes
+            .Where(f => f.Difficulty <= maxDifficulty && !requiredFallacyIds.Contains(f.Id))
+            .ToListAsync();
+
+        // 3. Combine required fallacies with additional ones
+        var allFallacies = requiredFallacies.ToList();
+        var remainingCount = count - allFallacies.Count;
+
+        // 4. Fill up to the desired count with random additional fallacies
+        if (remainingCount > 0 && additionalFallacies.Any())
         {
-            return fallacyTypes;
+            var random = new Random();
+            allFallacies.AddRange(
+                additionalFallacies
+                    .OrderBy(x => random.Next())
+                    .Take(remainingCount)
+            );
         }
 
-        // Return the requested number of fallacy types
-        return fallacyTypes.Take(count).ToList();
+        // 5. Shuffle the final list so correct answers aren't always at the same position
+        var random2 = new Random();
+        return allFallacies.OrderBy(x => random2.Next()).ToList();
     }
 }
