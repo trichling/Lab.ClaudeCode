@@ -67,7 +67,7 @@ public class QuizService : IQuizService
             PlayerName = playerName,
             Difficulty = difficulty,
             StartTime = DateTime.UtcNow,
-            TotalQuestions = QuestionsPerGame
+            TotalQuestions = questionCount
         };
 
         _context.GameSessions.Add(session);
