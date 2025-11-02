@@ -1,52 +1,87 @@
-# Logic Fallacy Quiz
+# 🧠 Logic Fallacy Quiz
 
-Ein interaktives Quiz-Spiel zum Training des kritischen Denkvermögens. Spieler müssen logische Fehlschlüsse in verschiedenen Aussagen identifizieren.
+Ein interaktives Quiz-Spiel zum Training des kritischen Denkvermögens. Spieler müssen logische Fehlschlüsse in verschiedenen Aussagen identifizieren und lernen dabei, argumentative Fehler zu erkennen.
 
-## Projektübersicht
+[![.NET](https://img.shields.io/badge/.NET-9.0-512BD4?logo=.net)](https://dotnet.microsoft.com/)
+[![Vue.js](https://img.shields.io/badge/Vue.js-3-4FC08D?logo=vue.js)](https://vuejs.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791?logo=postgresql)](https://www.postgresql.org/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-Das Projekt besteht aus drei Hauptkomponenten:
+## 📋 Inhaltsverzeichnis
 
-- **Backend (LogicQuiz.Api)**: C# WebAPI mit .NET 9
-- **Frontend (LogicQuiz.Web)**: Vue 3 Single Page Application
-- **Orchestrierung (LogicQuiz.AppHost)**: .NET Aspire zur Verwaltung aller Services
-- **Datenbank**: PostgreSQL
+- [Überblick](#überblick)
+- [Features](#features)
+- [Technologie-Stack](#technologie-stack)
+- [Schnellstart](#schnellstart)
+- [Projektstruktur](#projektstruktur)
+- [Dokumentation](#dokumentation)
+- [Contributing](#contributing)
+- [Lizenz](#lizenz)
 
-## Funktionen
+## 🎯 Überblick
 
-### Spielablauf
+Logic Fallacy Quiz ist eine moderne Full-Stack-Webanwendung, die Nutzer dabei unterstützt, logische Fehlschlüsse zu erkennen und ihr kritisches Denkvermögen zu trainieren.
 
-1. **Startseite**: Spieler geben ihren Namen ein und wählen einen Schwierigkeitsgrad:
-   - **Leicht**: 3 Antwortmöglichkeiten
-   - **Mittel**: 5 Antwortmöglichkeiten
-   - **Schwer**: 8 Antwortmöglichkeiten
+### Hauptkomponenten
 
-2. **Quiz**: Spieler erhalten 10 zufällige Fragen mit verschiedenen Aussagen, die logische Fehlschlüsse enthalten. Sie müssen den richtigen Fehlschluss aus den verfügbaren Optionen auswählen.
+```
+┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
+│   Vue.js SPA    │────▶│  .NET 9 Web API  │────▶│   PostgreSQL    │
+│  (Frontend)     │◀────│   (Backend)      │◀────│   (Database)    │
+└─────────────────┘     └──────────────────┘     └─────────────────┘
+         │                       │
+         └───────────────────────┘
+                  │
+         ┌────────▼────────┐
+         │  .NET Aspire    │
+         │  (AppHost)      │
+         └─────────────────┘
+```
 
-3. **Auswertung**: Nach Abschluss aller Fragen wird eine detaillierte Auswertung angezeigt:
-   - Anzahl richtiger/falscher Antworten
-   - Benötigte Zeit
-   - Gesamtpunktzahl (basierend auf Richtigkeit, Zeit und Schwierigkeit)
-   - Prozentualer Genauigkeitswert
+## ✨ Features
 
-### Logische Fehlschlüsse
+### 🎮 Spielmodi
 
-Das Spiel enthält mindestens 3 Beispiele für jeden der folgenden Fehlschlüsse:
+- **Leicht** (Easy): 3 Fragen, 3 Antwortmöglichkeiten
+- **Mittel** (Medium): 5 Fragen, 5 Antwortmöglichkeiten  
+- **Schwer** (Hard): 10 Fragen, 8 Antwortmöglichkeiten
 
-#### Schwierigkeit 1 (Leicht)
-- **Ad Hominem**: Angriff auf die Person statt auf das Argument
-- **Strohmann-Argument**: Verzerren der gegnerischen Position
-- **Falsche Dichotomie**: Präsentation von nur zwei Optionen
+### 🧩 Spielablauf
 
-#### Schwierigkeit 2 (Mittel)
-- **Argumentum ad Populum**: Etwas ist wahr, weil viele es glauben
-- **Post Hoc Ergo Propter Hoc**: Falsche Kausalität
+1. **Spielstart**: Name eingeben und Schwierigkeitsgrad wählen
+2. **Quiz**: Aussagen analysieren und korrekte Fehlschlüsse identifizieren
+3. **Auswertung**: Detaillierte Ergebnisse mit Score, Zeit und Genauigkeit
 
-#### Schwierigkeit 3 (Schwer)
-- **Zirkelschluss**: Schlussfolgerung bereits in Prämissen enthalten
-- **Tu Quoque**: Ablenkung durch Hinweis auf Heuchelei
-- **Argumentum ad Ignorantiam**: Etwas ist wahr, weil es nicht widerlegt wurde
+### 🎯 Logische Fehlschlüsse
 
-## Technologie-Stack
+Das Spiel deckt verschiedene Kategorien von logischen Fehlschlüssen ab:
+
+**Difficulty 1** (Basis)
+- Ad Hominem
+- Strohmann-Argument
+- Falsche Dichotomie
+
+**Difficulty 2** (Fortgeschritten)
+- Argumentum ad Populum
+- Post Hoc Ergo Propter Hoc
+- Slippery Slope
+- Hasty Generalization
+
+**Difficulty 3** (Expert)
+- Zirkelschluss
+- Tu Quoque
+- Argumentum ad Ignorantiam
+- Appeal to Authority
+- Red Herring
+
+### 🔒 Sicherheit
+
+- Entity Framework Core SQL-Injection-Schutz
+- Input-Validierung auf Controller-Ebene
+- Strukturiertes Logging für Monitoring
+- CORS-Konfiguration (konfigurierbar für Production)
+
+## 🛠 Technologie-Stack
 
 ### Backend
 - .NET 9
@@ -275,6 +310,96 @@ Die Punktzahl wird wie folgt berechnet:
 - Score (int)
 
 ### GameAnswers
+- Id (int, PK)
+- GameSessionId (int, FK)
+- QuestionId (int, FK)
+- SelectedFallacyTypeId (int, FK)
+- IsCorrect (bool)
+- AnsweredAt (DateTime)
+
+## 🧪 Testing
+
+Das Projekt enthält umfassende Unit Tests:
+
+```bash
+# Alle Tests ausführen
+dotnet test
+
+# Mit Detailausgabe
+dotnet test --logger "console;verbosity=detailed"
+
+# Tests mit Coverage
+dotnet test --collect:"XPlat Code Coverage"
+```
+
+**Test-Abdeckung:**
+- ✅ 14 Unit Tests
+- ✅ Alle Schwierigkeitsgrade getestet
+- ✅ Edge Cases abgedeckt
+- ✅ Fehlerbehandlung validiert
+
+## 📚 Dokumentation
+
+Für detaillierte Entwicklerdokumentation siehe:
+- [**DEVELOPER_GUIDE.md**](docs/DEVELOPER_GUIDE.md) - Umfassende Entwickler-Dokumentation
+- [**API_DOCUMENTATION.md**](docs/API_DOCUMENTATION.md) - Detaillierte API-Referenz
+- [**ARCHITECTURE.md**](docs/ARCHITECTURE.md) - Architektur-Übersicht
+
+## 🤝 Contributing
+
+Beiträge sind willkommen! Bitte folgen Sie diesen Schritten:
+
+1. Fork das Repository
+2. Erstellen Sie einen Feature-Branch (`git checkout -b feature/AmazingFeature`)
+3. Committen Sie Ihre Änderungen (`git commit -m 'Add some AmazingFeature'`)
+4. Pushen Sie den Branch (`git push origin feature/AmazingFeature`)
+5. Öffnen Sie einen Pull Request
+
+### Code-Standards
+
+- Folgen Sie den C# Coding Conventions
+- Verwenden Sie die `.editorconfig` Einstellungen
+- Schreiben Sie Tests für neue Features
+- Dokumentieren Sie öffentliche APIs
+
+## 🐛 Bekannte Probleme & Roadmap
+
+### Bekannte Probleme
+- CORS-Konfiguration aktuell zu permissiv (siehe Issue #X)
+- Keine Authentifizierung implementiert
+- Rate Limiting fehlt
+
+### Geplante Features
+- [ ] Benutzer-Authentifizierung und Accounts
+- [ ] Highscore-Tabelle
+- [ ] Mehrsprachigkeit (i18n)
+- [ ] Progressive Web App (PWA)
+- [ ] Erweiterte Analytics
+- [ ] Admin-Dashboard
+
+## 📝 Lizenz
+
+Dieses Projekt ist unter der MIT-Lizenz lizenziert - siehe [LICENSE](LICENSE) Datei für Details.
+
+## 👥 Autoren
+
+- **Tobias Richling** - *Initial work* - [trichling](https://github.com/trichling)
+
+## 🙏 Danksagungen
+
+- Inspiriert durch verschiedene Logik- und Fallacy-Training-Resources
+- Dank an die .NET und Vue.js Communities
+- Entity Framework Core und .NET Aspire Teams
+
+## 📞 Support
+
+Bei Fragen oder Problemen:
+- Öffnen Sie ein [Issue](https://github.com/trichling/Lab.ClaudeCode/issues)
+- Kontaktieren Sie den Maintainer
+
+---
+
+**Happy Coding! 🚀**
 - Id (int, PK)
 - GameSessionId (int, FK)
 - QuestionId (int, FK)
